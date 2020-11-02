@@ -1,0 +1,13 @@
+{
+  "version": "4.5.6",
+  "flags": {
+    "__ignore__": false,
+    "cat": false,
+    "dog": true
+  },
+  "shapes": [],
+  "imagePath": "dog.1011.jpg",
+  "imageData": null,
+  "imageHeight": 199,
+  "imageWidth": 300
+}
