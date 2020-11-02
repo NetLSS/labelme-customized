@@ -1,0 +1,8 @@
+"D:\2020\DS\Project\2020-11-02-labelme\labelme-master\examples\semantic_segmentation\data_annotated"
+--labels
+"D:\2020\DS\Project\2020-11-02-labelme\labelme-master\examples\semantic_segmentation\labels.txt"
+--nodata
+--validatelabel
+exact
+--config
+"{shift_auto_shape_color: -2}"

@@ -1,0 +1,4 @@
+"D:\2020\DS\Project\2020-11-02-labelme\labelme-master\examples\classification\data_annotated"
+--flags
+"D:\2020\DS\Project\2020-11-02-labelme\labelme-master\examples\classification\flags.txt"
+--nodata

@@ -1,0 +1,5 @@
+"D:\2020\DS\Project\2020-11-02-labelme\labelme-master\examples\bbox_detection\data_annotated"
+--labels
+"D:\2020\DS\Project\2020-11-02-labelme\labelme-master\examples\bbox_detection\labels.txt"
+--nodata
+--autosave

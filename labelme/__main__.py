@@ -50,7 +50,7 @@ def main():
     )
     # config for the gui
     parser.add_argument(
-        "--nodata",
+        "--nodata",  # image data 저장 안함
         dest="store_data",
         action="store_false",
         help="stop storing image data to JSON file",
@@ -84,7 +84,7 @@ def main():
         default=argparse.SUPPRESS,
     )
     parser.add_argument(
-        "--labels",
+        "--labels",  # 라벨 파일 설정
         help="comma separated list of labels OR file containing labels",
         default=argparse.SUPPRESS,
     )
