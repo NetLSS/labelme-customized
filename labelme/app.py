@@ -132,6 +132,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 "Press 'Esc' to deselect."
             )
         )
+        #self.uniqLabelList.itemDoubleClicked()
         if self._config["labels"]:
             for label in self._config["labels"]:  # 라벨 목록 설정
                 item = self.uniqLabelList.createItemFromLabel(label)
@@ -1294,6 +1295,7 @@ class MainWindow(QtWidgets.QMainWindow):
         flags = {}
         group_id = None
 
+        # sslee
         # use_default = True
         #
         # if use_default:
@@ -1302,7 +1304,14 @@ class MainWindow(QtWidgets.QMainWindow):
         #     if not text:
         #       self.labelDialog.edit.setText(previous_text)
 
-        if self._config["display_label_popup"] or not text:
+        if self.uniqLabelList.last_default_item is not None:
+            previous_text = self.labelDialog.edit.text()
+            text = self.uniqLabelList.last_default_item.toolTip()  # sslee
+            flags, group_id = ({}, None)
+            if not text:
+                self.labelDialog.edit.setText(previous_text)
+
+        elif self._config["display_label_popup"] or not text:
             previous_text = self.labelDialog.edit.text()
             text, flags, group_id = self.labelDialog.popUp(text)
             if not text:

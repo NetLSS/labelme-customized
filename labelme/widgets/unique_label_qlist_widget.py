@@ -7,6 +7,21 @@ from .escapable_qlist_widget import EscapableQListWidget
 
 
 class UniqueLabelQListWidget(EscapableQListWidget):
+    last_default_item = None
+
+    def mouseDoubleClickEvent(self, *args, **kwargs):  # sslee
+        #super(UniqueLabelQListWidget, self).mouseDoubleClickEvent(args, kwargs)
+
+        if self.last_default_item == self.currentItem():
+            self.currentItem().setBackground(Qt.white)
+            self.last_default_item = None
+            return
+
+        if self.last_default_item is not None:
+            self.last_default_item.setBackground(Qt.white)
+        self.currentItem().setBackground(Qt.red)
+        self.last_default_item = self.currentItem()
+
     def mousePressEvent(self, event):
         super(UniqueLabelQListWidget, self).mousePressEvent(event)
         if not self.indexAt(event.pos()).isValid():
@@ -35,6 +50,7 @@ class UniqueLabelQListWidget(EscapableQListWidget):
                     label, *color
                 )
             )
+            item.setToolTip(label)  # sslee
         qlabel.setAlignment(Qt.AlignBottom)
 
         item.setSizeHint(qlabel.sizeHint())
