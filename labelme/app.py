@@ -97,7 +97,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Main widgets and related state.
         self.labelDialog = LabelDialog(
             parent=self,
-            labels=self._config["labels"],
+            labels=self._config["labels"], # 라벨 설정
             sort_labels=self._config["sort_labels"],
             show_text_field=self._config["show_label_text_field"],
             completion=self._config["label_completion"],
@@ -135,7 +135,7 @@ class MainWindow(QtWidgets.QMainWindow):
             )
         )
         if self._config["labels"]:
-            for label in self._config["labels"]:
+            for label in self._config["labels"]:  # 라벨 목록 설정
                 item = self.uniqLabelList.createItemFromLabel(label)
                 self.uniqLabelList.addItem(item)
                 rgb = self._get_rgb_by_label(label)
@@ -315,7 +315,7 @@ class MainWindow(QtWidgets.QMainWindow):
         toggle_keep_prev_mode.setChecked(self._config["keep_prev"])
 
         createMode = action(
-            self.tr("Create Polygons"),
+            self.tr("생성 모드"),#self.tr("Create Polygons"),
             lambda: self.toggleDrawMode(False, createMode="polygon"),
             shortcuts["create_polygon"],
             "objects",
@@ -363,7 +363,7 @@ class MainWindow(QtWidgets.QMainWindow):
             enabled=False,
         )
         editMode = action(
-            self.tr("Edit Polygons"),
+            self.tr("수정 모드"),#self.tr("Edit Polygons"),
             self.setEditMode,
             shortcuts["edit_polygon"],
             "edit",
@@ -703,14 +703,14 @@ class MainWindow(QtWidgets.QMainWindow):
         )
 
         self.tools = self.toolbar("Tools")
-        # Menu buttons on Left
+        # Menu buttons on Left 좌측 메뉴
         self.actions.tool = (
-            open_,
+            #open_,
             opendir,
-            openNextImg,
-            openPrevImg,
-            save,
-            deleteFile,
+            #openNextImg,
+            #openPrevImg,
+            #save,
+            #deleteFile,
             None,
             createMode,
             editMode,
@@ -789,7 +789,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.firstStart = True
         # if self.firstStart:
         #    QWhatsThis.enterWhatsThisMode()
-
+    #####[init end]#####################################################################################################
+    
     def menu(self, title, actions=None):
         menu = self.menuBar().addMenu(title)
         if actions:

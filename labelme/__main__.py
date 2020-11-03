@@ -15,9 +15,11 @@ from labelme.app import MainWindow
 from labelme.config import get_config
 from labelme.logger import logger
 from labelme.utils import newIcon
-
+import labelme.AtiConf as ati
 
 def main():
+    ati.default_init()
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--version", "-V", action="store_true", help="show version"
@@ -115,21 +117,29 @@ def main():
 
     logger.setLevel(getattr(logging, args.logger_level.upper()))
 
-    if hasattr(args, "flags"):
+    if hasattr(args, "flags"):  # classification 시 flags (인자로 설정한 경우)
         if os.path.isfile(args.flags):
             with codecs.open(args.flags, "r", encoding="utf-8") as f:
                 args.flags = [line.strip() for line in f if line.strip()]
         else:
             args.flags = [line for line in args.flags.split(",") if line]
+    else:
+        if os.path.isfile(ati.default_flag_file_path):
+            with codecs.open(ati.default_flag_file_path, "r", encoding="utf-8") as f:
+                args.flags = [line.strip() for line in f if line.strip()]
 
-    if hasattr(args, "labels"):
+    if hasattr(args, "labels"):  # bbox detection, segmentation 시 labels (인자로 설정한 경우)
         if os.path.isfile(args.labels):
             with codecs.open(args.labels, "r", encoding="utf-8") as f:
                 args.labels = [line.strip() for line in f if line.strip()]
         else:
             args.labels = [line for line in args.labels.split(",") if line]
+    else:  # if 인자로 설정 안한 경우 set default file
+        if os.path.isfile(ati.default_label_file_path):
+            with codecs.open(ati.default_label_file_path, "r", encoding="utf-8") as f:
+                args.labels = [line.strip() for line in f if line.strip()]
 
-    if hasattr(args, "label_flags"):
+    if hasattr(args, "label_flags"):  # label 내부에서도 세부적인 상태 설정 시 (people 인데 여자 or 남자 등)
         if os.path.isfile(args.label_flags):
             with codecs.open(args.label_flags, "r", encoding="utf-8") as f:
                 args.label_flags = yaml.safe_load(f)
@@ -142,7 +152,7 @@ def main():
     filename = config_from_args.pop("filename")
     output = config_from_args.pop("output")
     config_file_or_yaml = config_from_args.pop("config")
-    config = get_config(config_file_or_yaml, config_from_args)
+    config = get_config(config_file_or_yaml, config_from_args)  # 기본 설정 파일 get
 
     if not config["labels"] and config["validate_label"]:
         logger.error(
