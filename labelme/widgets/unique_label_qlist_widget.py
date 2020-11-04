@@ -5,6 +5,7 @@ from qtpy import QtWidgets
 
 from .escapable_qlist_widget import EscapableQListWidget
 
+import labelme.AtiConf as ati
 
 class UniqueLabelQListWidget(EscapableQListWidget):
     last_default_item = None
@@ -19,8 +20,15 @@ class UniqueLabelQListWidget(EscapableQListWidget):
 
         if self.last_default_item is not None:
             self.last_default_item.setBackground(Qt.white)
-        self.currentItem().setBackground(Qt.red)
+        self.currentItem().setBackground(ati.default_flag_color)
         self.last_default_item = self.currentItem()
+
+        if ati.is_show_label_default_message:
+            mb = QtWidgets.QMessageBox
+            msg = self.tr(
+                "Default label set."
+            )
+            answer = mb.warning(self, self.tr("Attention"), msg, mb.Yes)
 
     def mousePressEvent(self, event):
         super(UniqueLabelQListWidget, self).mousePressEvent(event)

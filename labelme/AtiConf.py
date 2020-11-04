@@ -1,9 +1,18 @@
 import pathlib
 import os
 
+from qtpy import QtCore
+from qtpy.QtCore import Qt
+from qtpy import QtGui
+from qtpy import QtWidgets
+
 default_label_file_path = r"C:\labelme\labels.txt"
 default_flag_file_path = r"C:\labelme\flags.txt"
 
+default_flag_color = Qt.cyan
+
+is_show_flag_default_message = True
+is_show_label_default_message = True
 
 def make_dir_tree(dir):
     pathlib.Path(dir).mkdir(parents=True, exist_ok=True)

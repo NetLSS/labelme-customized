@@ -13,6 +13,8 @@ from qtpy.QtCore import Qt
 from qtpy import QtGui
 from qtpy import QtWidgets
 
+
+
 from labelme import __appname__
 from labelme import PY2
 from labelme import QT5
@@ -31,6 +33,10 @@ from labelme.widgets import LabelListWidgetItem
 from labelme.widgets import ToolBar
 from labelme.widgets import UniqueLabelQListWidget
 from labelme.widgets import ZoomWidget
+from labelme.widgets.flags_widget import FlagWidget
+
+import labelme.AtiConf as ati
+
 
 # FIXME
 # - [medium] Set max zoom value to something big enough for FitWidth/Window
@@ -109,11 +115,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.flag_dock = self.flag_widget = None
         self.flag_dock = QtWidgets.QDockWidget(self.tr("Flags"), self)
         self.flag_dock.setObjectName("Flags")
-        self.flag_widget = QtWidgets.QListWidget()
+        self.flag_widget = FlagWidget()  # QtWidgets.QListWidget() # sslee
         if config["flags"]:
             self.loadFlags({k: False for k in config["flags"]})
         self.flag_dock.setWidget(self.flag_widget)
         self.flag_widget.itemChanged.connect(self.setDirty)
+
 
         self.labelList.itemSelectionChanged.connect(self.labelSelectionChanged)
         self.labelList.itemDoubleClicked.connect(self.editLabel)
@@ -132,7 +139,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 "Press 'Esc' to deselect."
             )
         )
-        #self.uniqLabelList.itemDoubleClicked()
+        #self.uniqLabelList.itemDoubleClicked() sslee
         if self._config["labels"]:
             for label in self._config["labels"]:  # 라벨 목록 설정
                 item = self.uniqLabelList.createItemFromLabel(label)
@@ -288,10 +295,11 @@ class MainWindow(QtWidgets.QMainWindow):
         saveAuto.setChecked(self._config["auto_save"])
 
         saveWithImageData = action(
-            text="Save With Image Data",
+            text="Save With Image Data("+str(self._config["store_data"])+" only)",
             slot=self.enableSaveImageWithData,
             tip="Save image data in label file",
             checkable=True,
+            enabled=False,
             checked=self._config["store_data"],
         )
 
@@ -304,7 +312,7 @@ class MainWindow(QtWidgets.QMainWindow):
         )
 
         toggle_keep_prev_mode = action(
-            self.tr("Keep Previous Annotation"),
+            self.tr("Keep Previous Annotation"),  # 이전 그렸던 라벨 그대로 들고 다음 이미지에 붙여줌
             self.toggleKeepPrevMode,
             shortcuts["toggle_keep_prev_mode"],
             None,
@@ -314,7 +322,7 @@ class MainWindow(QtWidgets.QMainWindow):
         toggle_keep_prev_mode.setChecked(self._config["keep_prev"])
 
         createMode = action(
-            self.tr("Create Polygons"),  # self.tr("Create Polygons"),
+            self.tr("다각형 모드"),  # self.tr("Create Polygons"),
             lambda: self.toggleDrawMode(False, createMode="polygon"),
             shortcuts["create_polygon"],
             "objects",
@@ -322,7 +330,7 @@ class MainWindow(QtWidgets.QMainWindow):
             enabled=False,
         )
         createRectangleMode = action(
-            self.tr("Create Rectangle"),
+            self.tr("사각형 모드"), #self.tr("Create Rectangle"),
             lambda: self.toggleDrawMode(False, createMode="rectangle"),
             shortcuts["create_rectangle"],
             "objects",
@@ -330,7 +338,7 @@ class MainWindow(QtWidgets.QMainWindow):
             enabled=False,
         )
         createCircleMode = action(
-            self.tr("Create Circle"),
+            self.tr("원형 모드"),#self.tr("Create Circle"),
             lambda: self.toggleDrawMode(False, createMode="circle"),
             shortcuts["create_circle"],
             "objects",
@@ -338,7 +346,7 @@ class MainWindow(QtWidgets.QMainWindow):
             enabled=False,
         )
         createLineMode = action(
-            self.tr("Create Line"),
+            self.tr("직선형 모드"),#self.tr("Create Line"),
             lambda: self.toggleDrawMode(False, createMode="line"),
             shortcuts["create_line"],
             "objects",
@@ -346,7 +354,7 @@ class MainWindow(QtWidgets.QMainWindow):
             enabled=False,
         )
         createPointMode = action(
-            self.tr("Create Point"),
+            self.tr("점 모드"),#self.tr("Create Point"),
             lambda: self.toggleDrawMode(False, createMode="point"),
             shortcuts["create_point"],
             "objects",
@@ -354,7 +362,7 @@ class MainWindow(QtWidgets.QMainWindow):
             enabled=False,
         )
         createLineStripMode = action(
-            self.tr("Create LineStrip"),
+            self.tr("다직선 모드"), #self.tr("Create LineStrip"),
             lambda: self.toggleDrawMode(False, createMode="linestrip"),
             shortcuts["create_linestrip"],
             "objects",
@@ -378,6 +386,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Delete the selected polygons"),
             enabled=False,
         )
+
         copy = action(
             self.tr("Duplicate Polygons"),
             self.copySelectedShape,
@@ -544,6 +553,88 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         fill_drawing.trigger()
 
+        # custom action (lss)
+        classification_numKey_1 = action(
+            self.tr("&Classification to class1"),
+            self.classification_to_0,
+            shortcuts["classification_numKey_1"],
+            "classification_numKey_1",
+            self.tr(u"classification_numKey_1"),
+            enabled=True,
+        )
+        classification_numKey_2 = action(
+            self.tr("&Classification to class2"),
+            self.classification_to_1,
+            shortcuts["classification_numKey_2"],
+            "classification_numKey_2",
+            self.tr(u"classification_numKey_2"),
+            enabled=True
+        )
+        classification_numKey_3 = action(
+            self.tr("&Classification to class3"),
+            self.classification_to_2,
+            shortcuts["classification_numKey_3"],
+            "classification_numKey_3",
+            self.tr(u"classification_numKey_3"),
+            enabled=True
+        )
+        classification_numKey_4 = action(
+            self.tr("&Classification to class4"),
+            self.classification_to_3,
+            shortcuts["classification_numKey_4"],
+            "classification_numKey_4",
+            self.tr(u"classification_numKey_4"),
+            enabled=True
+        )
+        classification_numKey_5 = action(
+            self.tr("&Classification to class5"),
+            self.classification_to_4,
+            shortcuts["classification_numKey_5"],
+            "classification_numKey_5",
+            self.tr(u"classification_numKey_5"),
+            enabled=True
+        )
+        classification_numKey_6 = action(
+            self.tr("&Classification to class6"),
+            self.classification_to_5,
+            shortcuts["classification_numKey_6"],
+            "classification_numKey_6",
+            self.tr(u"classification_numKey_6"),
+            enabled=True
+        )
+        classification_numKey_7 = action(
+            self.tr("&Classification to class7"),
+            self.classification_to_6,
+            shortcuts["classification_numKey_7"],
+            "classification_numKey_7",
+            self.tr(u"classification_numKey_7"),
+            enabled=True
+        )
+        classification_numKey_8 = action(
+            self.tr("&Classification to class8"),
+            self.classification_to_7,
+            shortcuts["classification_numKey_8"],
+            "classification_numKey_8",
+            self.tr(u"classification_numKey_8"),
+            enabled=True
+        )
+        classification_numKey_9 = action(
+            self.tr("&Classification to class9"),
+            self.classification_to_8,
+            shortcuts["classification_numKey_9"],
+            "classification_numKey_9",
+            self.tr(u"classification_numKey_9"),
+            enabled=True
+        )
+        classification_numKey_0 = action(
+            self.tr("&Classification to class10"),
+            self.classification_to_9,
+            shortcuts["classification_numKey_0"],
+            "classification_numKey_0",
+            self.tr(u"classification_numKey_0"),
+            enabled=True
+        )
+
         # Lavel list context menu.
         labelMenu = QtWidgets.QMenu()
         utils.addActions(labelMenu, (edit, delete))
@@ -590,6 +681,17 @@ class MainWindow(QtWidgets.QMainWindow):
             fileMenuActions=(open_, opendir, save, saveAs, close, quit),
             tool=(),
             # XXX: need to add some actions here to activate the shortcut
+            classification_numKey_0=classification_numKey_0,
+            classification_numKey_1=classification_numKey_1,
+            classification_numKey_2=classification_numKey_2,
+            classification_numKey_3=classification_numKey_3,
+            classification_numKey_4=classification_numKey_4,
+            classification_numKey_5=classification_numKey_5,
+            classification_numKey_6=classification_numKey_6,
+            classification_numKey_7=classification_numKey_7,
+            classification_numKey_8=classification_numKey_8,
+            classification_numKey_9=classification_numKey_9,
+
             editMenu=(
                 edit,
                 copy,
@@ -601,6 +703,17 @@ class MainWindow(QtWidgets.QMainWindow):
                 addPointToEdge,
                 None,
                 toggle_keep_prev_mode,
+                None,
+                classification_numKey_1,
+                classification_numKey_2,
+                classification_numKey_3,
+                classification_numKey_4,
+                classification_numKey_5,
+                classification_numKey_6,
+                classification_numKey_7,
+                classification_numKey_8,
+                classification_numKey_9,
+                classification_numKey_0,
             ),
             # menu shown at right click
             menu=(
@@ -790,6 +903,17 @@ class MainWindow(QtWidgets.QMainWindow):
         #    QWhatsThis.enterWhatsThisMode()
 
     #####[init end]#####################################################################################################
+
+    # def keyPressEvent(self, event):  # sslee 동작 안함..
+    #     super(MainWindow, self).keyPressEvent(event)
+    #     if event.key() == QtCore.Qt.Key_0:
+    #         print("00")
+    #     elif event.key() == QtCore.Qt.Key_1:
+    #         print("11")
+    #     elif event.key() == QtCore.Qt.Key_2:
+    #         print("22")
+
+
 
     def menu(self, title, actions=None):
         menu = self.menuBar().addMenu(title)
@@ -1192,12 +1316,27 @@ class MainWindow(QtWidgets.QMainWindow):
         self.loadShapes(s)
 
     def loadFlags(self, flags):
+        """
+        sslee 2020-11-14
+        flags load 시 이전 default 라벨 유지 하도록 함.
+        """
+        last_toolTip = None
+        if self.flag_widget.last_default_item is not None:
+            last_toolTip = self.flag_widget.last_default_item.toolTip()
+            self.flag_widget.last_default_item.setBackground(Qt.white)
         self.flag_widget.clear()
         for key, flag in flags.items():
             item = QtWidgets.QListWidgetItem(key)
+            item.setBackground(Qt.white)  # sslee
+            item.setToolTip(key)
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Checked if flag else Qt.Unchecked)
             self.flag_widget.addItem(item)
+            if last_toolTip == key:
+                item.setBackground(ati.default_flag_color)
+                item.setCheckState(Qt.Checked)
+                self.flag_widget.last_default_item = item
+
 
     def saveLabels(self, filename):
         lf = LabelFile()
@@ -1303,15 +1442,16 @@ class MainWindow(QtWidgets.QMainWindow):
         #     text, flags, group_id = ("test", {}, None)
         #     if not text:
         #       self.labelDialog.edit.setText(previous_text)
-
+        fixed_label = False
         if self.uniqLabelList.last_default_item is not None:
             previous_text = self.labelDialog.edit.text()
             text = self.uniqLabelList.last_default_item.toolTip()  # sslee
             flags, group_id = ({}, None)
             if not text:
                 self.labelDialog.edit.setText(previous_text)
+            fixed_label = True
 
-        elif self._config["display_label_popup"] or not text:
+        if not fixed_label and (self._config["display_label_popup"] or not text):
             previous_text = self.labelDialog.edit.text()
             text, flags, group_id = self.labelDialog.popUp(text)
             if not text:
@@ -2010,7 +2150,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.fileListWidget.addItem(item)
 
-        # sslee : move last labeling
+        # sslee : move last labeling point
         if first_unchecked_item is not None:
             self.fileListWidget.setCurrentItem(first_unchecked_item)
         else:
@@ -2030,3 +2170,49 @@ class MainWindow(QtWidgets.QMainWindow):
                     images.append(relativePath)
         images.sort(key=lambda x: x.lower())
         return images
+
+    # custom def (lss)
+
+    def classification_to_number(self, number):
+        """
+        number: 0~
+        """
+        item = self.flag_widget.item(number)
+
+        if number >= self.flag_widget.count():
+            return
+
+        if item.checkState() == Qt.Checked:
+            item.setCheckState(Qt.Unchecked)
+        else:
+            item.setCheckState(Qt.Checked)
+
+    def classification_to_0(self):
+        self.classification_to_number(0)
+
+    def classification_to_1(self):
+        self.classification_to_number(1)
+
+    def classification_to_2(self):
+        self.classification_to_number(2)
+
+    def classification_to_3(self):
+        self.classification_to_number(3)
+
+    def classification_to_4(self):
+        self.classification_to_number(4)
+
+    def classification_to_5(self):
+        self.classification_to_number(5)
+
+    def classification_to_6(self):
+        self.classification_to_number(6)
+
+    def classification_to_7(self):
+        self.classification_to_number(7)
+
+    def classification_to_8(self):
+        self.classification_to_number(8)
+
+    def classification_to_9(self):
+        self.classification_to_number(9)

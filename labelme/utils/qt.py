@@ -35,6 +35,7 @@ def newAction(
     checkable=False,
     enabled=True,
     checked=False,
+    visible=True,
 ):
     """Create a new action and assign callbacks, shortcuts, etc."""
     a = QtWidgets.QAction(text, parent)
@@ -53,6 +54,8 @@ def newAction(
         a.triggered.connect(slot)
     if checkable:
         a.setCheckable(True)
+    if not visible:  # 2020-11-04 sslee
+        a.setVisible(False)
     a.setEnabled(enabled)
     a.setChecked(checked)
     return a
