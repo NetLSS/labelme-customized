@@ -290,7 +290,8 @@ class MainWindow(QtWidgets.QMainWindow):
             icon="save",
             tip=self.tr("Save automatically"),
             checkable=True,
-            enabled=True,
+            enabled=False,
+            checked=self._config["auto_save"],
         )
         saveAuto.setChecked(self._config["auto_save"])
 
