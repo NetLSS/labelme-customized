@@ -29,6 +29,8 @@ class Canvas(QtWidgets.QWidget):
     edgeSelected = QtCore.Signal(bool, object)
     vertexSelected = QtCore.Signal(bool)
 
+    current_none_now = False
+
     CREATE, EDIT = 0, 1
 
     # polygon, rectangle, line, or point
@@ -362,9 +364,15 @@ class Canvas(QtWidgets.QWidget):
             self.selectShapePoint(pos, multiple_selection_mode=group_mode)
             self.prevPoint = pos
             self.repaint()
+        elif ev.button() == QtCore.Qt.RightButton and self.drawing():
+            if self.current:
+                self.current_none_now = True   # sslee (2020-11-06) right click cancel
+            self.current = None
+            self.drawingPolygon.emit(False)
+            self.update()
 
     def mouseReleaseEvent(self, ev):
-        if ev.button() == QtCore.Qt.RightButton:
+        if ev.button() == QtCore.Qt.RightButton and not self.current_none_now:   # sslee (2020-11-06) right click cancel
             menu = self.menus[len(self.selectedShapesCopy) > 0]
             self.restoreCursor()
             if (
@@ -389,6 +397,9 @@ class Canvas(QtWidgets.QWidget):
             ):
                 # Delete point if: left-click + SHIFT on a point
                 self.removeSelectedPoint()
+
+        if self.current_none_now:  # sslee (2020-11-06)  right click cancel
+            self.current_none_now = False
 
         if self.movingShape and self.hShape:
             index = self.shapes.index(self.hShape)
