@@ -10,6 +10,9 @@ import PIL.Image
 from labelme.logger import logger
 from labelme import utils
 
+"""
+json_to_dataset apc2016_obj3.json -o apc2016_obj3_json
+"""
 
 def main():
     logger.warning(

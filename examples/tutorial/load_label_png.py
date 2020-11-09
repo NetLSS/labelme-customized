@@ -18,6 +18,7 @@ def main():
 
     lbl = np.asarray(PIL.Image.open(label_png))
     labels = np.unique(lbl)
+    print("labels:", labels)
 
     label_names_txt = osp.join(here, "apc2016_obj3_json/label_names.txt")
     label_names = [name.strip() for name in open(label_names_txt)]

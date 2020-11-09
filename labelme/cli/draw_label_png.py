@@ -7,6 +7,10 @@ import PIL.Image
 
 from labelme.logger import logger
 
+"""
+draw label png
+(uint8)
+"""
 
 def main():
     parser = argparse.ArgumentParser(

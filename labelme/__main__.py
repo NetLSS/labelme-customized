@@ -6,6 +6,8 @@ import os.path as osp
 import sys
 import yaml
 
+sys.path.insert(0, r'D:\2020\DS\Project\2020-11-02-labelme\labelme-master')
+
 from qtpy import QtCore
 from qtpy import QtWidgets
 

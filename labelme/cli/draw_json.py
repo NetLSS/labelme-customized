@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 from labelme.label_file import LabelFile
 from labelme import utils
 
+"""
+json file viz
+"""
 
 PY2 = sys.version_info[0] == 2
 
