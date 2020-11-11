@@ -34,6 +34,7 @@ from labelme.widgets import ToolBar
 from labelme.widgets import UniqueLabelQListWidget
 from labelme.widgets import ZoomWidget
 from labelme.widgets.flags_widget import FlagWidget
+from labelme.widgets.label_validation import LabelValidationDialog
 
 import labelme.AtiConf as ati
 
@@ -290,7 +291,7 @@ class MainWindow(QtWidgets.QMainWindow):
             icon="save",
             tip=self.tr("Save automatically"),
             checkable=True,
-            enabled=False,
+            #enabled=False,
             checked=self._config["auto_save"],
         )
         saveAuto.setChecked(self._config["auto_save"])
@@ -635,6 +636,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr(u"classification_numKey_0"),
             enabled=True
         )
+        label_validate = action(
+            self.tr("&label validator"),
+            self.label_validator,
+            None,
+            "label_validator",
+            self.tr(u"label_validator"),
+            enabled=True
+        )
 
         # Lavel list context menu.
         labelMenu = QtWidgets.QMenu()
@@ -692,6 +701,7 @@ class MainWindow(QtWidgets.QMainWindow):
             classification_numKey_7=classification_numKey_7,
             classification_numKey_8=classification_numKey_8,
             classification_numKey_9=classification_numKey_9,
+            label_validate=label_validate,
 
             editMenu=(
                 edit,
@@ -754,6 +764,7 @@ class MainWindow(QtWidgets.QMainWindow):
             file=self.menu(self.tr("&File")),
             edit=self.menu(self.tr("&Edit")),
             view=self.menu(self.tr("&View")),
+            tools=self.menu(self.tr("&Tools")),
             help=self.menu(self.tr("&Help")),
             recentFiles=QtWidgets.QMenu(self.tr("Open &Recent")),
             labelList=labelMenu,
@@ -779,6 +790,12 @@ class MainWindow(QtWidgets.QMainWindow):
             ),
         )
         utils.addActions(self.menus.help, (help,))
+        utils.addActions(
+            self.menus.tools,
+            (
+                label_validate,
+            ),
+        )
         utils.addActions(
             self.menus.view,
             (
@@ -2217,3 +2234,26 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def classification_to_9(self):
         self.classification_to_number(9)
+
+    def label_validator(self):
+
+        label_validation_dlg = LabelValidationDialog()
+        label_validation_dlg.exec_()
+        # dialog = (
+        #     utils.img_data_to_pil(self.imageData),
+        #     self.onNewBrightnessContrast,
+        #     parent=self,
+        # )
+        # brightness, contrast = self.brightnessContrast_values.get(
+        #     self.filename, (None, None)
+        # )
+        # if brightness is not None:
+        #     dialog.slider_brightness.setValue(brightness)
+        # if contrast is not None:
+        #     dialog.slider_contrast.setValue(contrast)
+        # label_validation_dlg = LabelValidationDialog()
+        # label_validation_dlg.exec_exec_()
+
+        # brightness = dialog.slider_brightness.value()
+        # contrast = dialog.slider_contrast.value()
+        # self.brightnessContrast_values[self.filename] = (brightness, contrast)

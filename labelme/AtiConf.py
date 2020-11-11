@@ -28,7 +28,7 @@ def default_init():
         with open(default_label_file_path, 'w', encoding="utf-8") as f:
             f.write("__ignore__\n")
             f.write("_background_\n")
-            f.write("test\n")
+            f.write("defect\n")
 
     # create default flag
     if not os.path.exists(default_flag_file_path):
