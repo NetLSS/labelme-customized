@@ -11,6 +11,7 @@ from PyQt5.QtGui import QPalette, QImage, qRgb, QPixmap
 import subprocess
 
 import clipboard
+import win32clipboard
 import argparse
 import json
 import numpy as np
@@ -92,6 +93,11 @@ class LabelValidationDialog(QDialog, from_class):
         self.pushButton_left.clicked.connect(self.onButtonClickLeft)
         self.pushButton_right.clicked.connect(self.onButtonClickRight)
         self.pushButton_filter_apply.clicked.connect(self.onButtonClickFilterApply)
+        self.pushButton_copyPathA.clicked.connect(self.onButtonClickCopyPathA)
+        self.pushButton_copyFolderA.clicked.connect(self.onButtonClickCopyFolderA)
+        self.pushButton_copyPathB.clicked.connect(self.onButtonClickCopyPathB)
+        self.pushButton_copyFolderB.clicked.connect(self.onButtonClickCopyFolderB)
+        self.pushButton_deleteA.clicked.connect(self.onButtonClickDeleteA)
 
         self.progressBar.setValue(0)
 
@@ -106,6 +112,57 @@ class LabelValidationDialog(QDialog, from_class):
         self.resultDataList = []
         self.filteredResultDataList = []
         self.current_image_index = -1
+
+
+    def onButtonClickCopyFolderB(self):
+        arr_index = self.current_image_index - 1
+        # clipboard.copy(self.filteredResultDataList[arr_index].json_true)
+
+        win32clipboard.OpenClipboard()
+        win32clipboard.EmptyClipboard()
+        win32clipboard.SetClipboardText(osp.dirname(self.filteredResultDataList[arr_index].json_target))
+        win32clipboard.CloseClipboard()
+
+    def onButtonClickCopyPathB(self):
+        arr_index = self.current_image_index - 1
+        # clipboard.copy(self.filteredResultDataList[arr_index].json_true)
+
+        win32clipboard.OpenClipboard()
+        win32clipboard.EmptyClipboard()
+        win32clipboard.SetClipboardText(self.filteredResultDataList[arr_index].json_target)
+        win32clipboard.CloseClipboard()
+
+    def onButtonClickDeleteA(self):
+        arr_index = self.current_image_index - 1
+        reply = QMessageBox.question(self, "warning", 'Are you sure to delete?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            if osp.exists(self.filteredResultDataList[arr_index].json_true):
+                os.remove(self.filteredResultDataList[arr_index].json_true)
+                self.filteredResultDataList.remove(self.filteredResultDataList[arr_index])
+                self.current_image_index += 1
+                self.updateImageLabel()
+        else:
+            return
+
+
+
+    def onButtonClickCopyFolderA(self):
+        arr_index = self.current_image_index - 1
+        # clipboard.copy(self.filteredResultDataList[arr_index].json_true)
+
+        win32clipboard.OpenClipboard()
+        win32clipboard.EmptyClipboard()
+        win32clipboard.SetClipboardText(osp.dirname(self.filteredResultDataList[arr_index].json_true))
+        win32clipboard.CloseClipboard()
+
+    def onButtonClickCopyPathA(self):
+        arr_index = self.current_image_index - 1
+        #clipboard.copy(self.filteredResultDataList[arr_index].json_true)
+
+        win32clipboard.OpenClipboard()
+        win32clipboard.EmptyClipboard()
+        win32clipboard.SetClipboardText(self.filteredResultDataList[arr_index].json_true)
+        win32clipboard.CloseClipboard()
 
     def onButtonClickFilterApply(self):
         self.updateFilteredResultList()
@@ -337,6 +394,8 @@ class LabelValidationDialog(QDialog, from_class):
     def updateImageLabel(self):
         if self.current_image_index <= 0:
             return
+        if self.current_image_index > len(self.filteredResultDataList):
+            self.current_image_index = 1
 
         arr_index = self.current_image_index - 1
 
