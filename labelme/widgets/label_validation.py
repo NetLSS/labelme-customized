@@ -26,6 +26,11 @@ import imgviz
 import matplotlib.pyplot as plt
 
 
+TEST_MODE = True
+
+if TEST_MODE:
+    os.chdir(r'D:\2020\DS\Project\2020-11-02-labelme\labelme-master\labelme')
+
 from_class = uic.loadUiType("./widgets/label_validation.ui")[0]
 
 ROUND_NUMBER = 4
@@ -106,7 +111,7 @@ class LabelValidationDialog(QDialog, from_class):
         self.pushButton_deleteB.clicked.connect(self.onButtonClickDeleteB)
         self.pushButton_merge_quit.clicked.connect(self.onButtonClickMergeQuit)
 
-        qqq = QLabel()
+        self.lineEdit_iouThreshold.setVisible(False)
 
         self.progressBar.setValue(0)
 
@@ -114,6 +119,7 @@ class LabelValidationDialog(QDialog, from_class):
         self.lineEdit_folderB.setText("D:/2020/DS/Project/2020-11-02-labelme/labelme-master/labelme/cli/validataion_example/user_label")
 
         self.lineEdit_iouThreshold.editingFinished.connect(self.onEditionFinishedIouThreshold)
+        self.lineEdit_threshold.editingFinished.connect(self.onEditionFinishedThreshold)
 
         self.viewerA = PhotoViewer(self)
         self.viewerA.setFixedSize(416, 416)
@@ -170,8 +176,6 @@ class LabelValidationDialog(QDialog, from_class):
             return
         else:
             return
-
-
 
     def checkResultDataListIsExist(self):
         if self.filteredResultDataList:
@@ -309,8 +313,33 @@ class LabelValidationDialog(QDialog, from_class):
 
     def onEditionFinishedIouThreshold(self):
         txt = self.lineEdit_iouThreshold.text()
-        if not txt.isdigit():
+        if not self.is_digit(txt):
             self.lineEdit_iouThreshold.setText("0.5")
+            return
+
+        if float(txt) > 1.0:
+            self.lineEdit_threshold.setText("1.0")
+        elif float(txt) < 0.0:
+            self.lineEdit_threshold.setText("0.0")
+
+    def is_digit(self, str):
+        try:
+            tmp = float(str)
+            return True
+        except ValueError:
+            return False
+
+    def onEditionFinishedThreshold(self):
+        txt = self.lineEdit_threshold.text()
+        if not self.is_digit(txt):
+            self.lineEdit_threshold.setText("0.5")
+            return
+
+        if float(txt) > 1.0:
+            self.lineEdit_threshold.setText("1.0")
+        elif float(txt) < 0.0:
+            self.lineEdit_threshold.setText("0.0")
+
 
     def onButtonClickOpenA(self):
         path = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
@@ -328,6 +357,8 @@ class LabelValidationDialog(QDialog, from_class):
         iou_treshold_value = float(self.lineEdit_iouThreshold.text())
 
         self.resultDataList.clear()
+        self.only_true_folder_json.clear()
+        self.only_target_folder_json.clear()
 
         result_path = osp.join(osp.dirname(true_json_folder_path), "result")
         if not osp.exists(result_path):
@@ -354,14 +385,14 @@ class LabelValidationDialog(QDialog, from_class):
 
                 self.validate_json_file(true_json, target_json, result_path, iou_treshold_value)
 
-                data_true = json.load(open(true_json))
-                data_target = json.load(open(target_json))
+                # data_true = json.load(open(true_json))
+                # data_target = json.load(open(target_json))
 
-                img_true = self.image_data_load(data_true)
-                img_target = self.image_data_load(data_target)
-
-                img_true = np.array(img_true)
-                img_target = np.array(img_target)
+                # img_true = self.image_data_load(data_true)
+                # img_target = self.image_data_load(data_target)
+                #
+                # img_true = np.array(img_true)
+                # img_target = np.array(img_target)
 
                 # Qimage_true = self.tpQImage(img_true)#QImage(img_true.data, h, w, QImage.Format_Indexed8)
                 # Qimage_target = self.tpQImage(img_target)
@@ -594,7 +625,7 @@ class LabelValidationDialog(QDialog, from_class):
 
         pass
 
-    def validate_json_file(self, true_json, target_json, out_full_path=None, threshold=0.5, show_image=False):
+    def validate_json_file(self, true_json, target_json, out_full_path=None, threshold=0.5, show_image=False, isDebug=False, save_image=False):
         json_file_true = true_json
         json_file_target = target_json
 
@@ -639,7 +670,8 @@ class LabelValidationDialog(QDialog, from_class):
         # print(f"np.max(lbl_true) {np.max(lbl_true)}")
         # print(f"np.max(lbl_target) {np.max(lbl_target)}")
         max_label_number = max(np.max(lbl_true), np.max(lbl_target))
-        print(f"max label number: {max_label_number}")
+        if isDebug:
+            print(f"max label number: {max_label_number}")
 
         validate_count = 0.0
 
@@ -675,9 +707,10 @@ class LabelValidationDialog(QDialog, from_class):
                 lowest_acc = round(accuracy, ROUND_NUMBER)
                 lowest_class = i
 
-            print(
-                f"[{i}:{label_names_true[i]}] class accuracy: {accuracy:.3f}% ({intersection_region}/{true_region_sum})")
-            print(f"[{i}:{label_names_true[i]}] class iou: {iou:.3f}% ({intersection_region}/{union_region})")
+            if isDebug:
+                print(
+                    f"[{i}:{label_names_true[i]}] class accuracy: {accuracy:.3f}% ({intersection_region}/{true_region_sum})")
+                print(f"[{i}:{label_names_true[i]}] class iou: {iou:.3f}% ({intersection_region}/{union_region})")
 
         iou_avg = round(iou_sum * 1.0 / validate_count, ROUND_NUMBER)
         acc_avg = round(acc_sum * 1.0 / validate_count, ROUND_NUMBER)
@@ -696,25 +729,28 @@ class LabelValidationDialog(QDialog, from_class):
         self.resultDataList.append(ResultData(true_json, target_json, label_names_true, accuracy_list, iou_list))
 
         # region save image
-        good_prefix = f"good({threshold})"
-        bad_prefix = f"bad({threshold})"
-        if not osp.exists(osp.join(out_dir, good_prefix)):
-            os.mkdir(osp.join(out_dir, good_prefix))
+        if save_image:
+            good_prefix = f"good({threshold})"
+            bad_prefix = f"bad({threshold})"
+            if not osp.exists(osp.join(out_dir, good_prefix)):
+                os.mkdir(osp.join(out_dir, good_prefix))
 
-        if not osp.exists(osp.join(out_dir, bad_prefix)):
-            os.mkdir(osp.join(out_dir, bad_prefix))
+            if not osp.exists(osp.join(out_dir, bad_prefix)):
+                os.mkdir(osp.join(out_dir, bad_prefix))
 
-        if iou < threshold:
-            current_out_dir = osp.join(out_dir, bad_prefix)
-        else:
-            current_out_dir = osp.join(out_dir, good_prefix)
+            if iou < threshold:
+                current_out_dir = osp.join(out_dir, bad_prefix)
+            else:
+                current_out_dir = osp.join(out_dir, good_prefix)
 
-        utils.lblsave(osp.join(current_out_dir, f"{osp.basename(true_json)}_label_true({iou:.3f}%).png"), lbl_true)
-        utils.lblsave(osp.join(current_out_dir, f"{osp.basename(target_json)}_label_target({iou:.3f}%).png"),
-                      lbl_target)
-        utils.lblsave(osp.join(current_out_dir, f"{osp.basename(target_json)}_label_diff({iou:.3f}%).png"),
-                      lbl_true - lbl_target)
-        logger.info("Saved to: {}".format(current_out_dir))
+            utils.lblsave(osp.join(current_out_dir, f"{osp.basename(true_json)}_label_true({iou:.3f}%).png"), lbl_true)
+            utils.lblsave(osp.join(current_out_dir, f"{osp.basename(target_json)}_label_target({iou:.3f}%).png"),
+                          lbl_target)
+            utils.lblsave(osp.join(current_out_dir, f"{osp.basename(target_json)}_label_diff({iou:.3f}%).png"),
+                          lbl_true - lbl_target)
+            logger.info("Saved to: {}".format(current_out_dir))
+        # endregion
+
 
     def get_json_file_list(self, true_json_folder_path):
         return glob.glob(os.path.join(true_json_folder_path, "*.json"))

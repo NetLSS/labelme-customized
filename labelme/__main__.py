@@ -10,6 +10,7 @@ import yaml
 사용시 아래 경로에 root 폴더 지정할것.
 C:\\Users\\[사용자명]\\.labelmerc 제거하고 실행하기
 """
+
 sys.path.insert(0, r'D:\2020\DS\Project\2020-11-02-labelme\labelme-master')
 
 from qtpy import QtCore
@@ -21,6 +22,7 @@ from labelme.app import MainWindow
 from labelme.config import get_config
 from labelme.logger import logger
 from labelme.utils import newIcon
+
 import labelme.AtiConf as ati
 
 def main():

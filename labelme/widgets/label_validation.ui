@@ -145,13 +145,6 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0" colspan="3">
-     <widget class="QProgressBar" name="progressBar">
-      <property name="value">
-       <number>24</number>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="2">
      <widget class="QPushButton" name="pushButton_openB">
       <property name="text">
@@ -221,6 +214,22 @@
       </property>
       <property name="placeholderText">
        <string>iou threshold</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="3">
+     <widget class="QProgressBar" name="progressBar">
+      <property name="font">
+       <font>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+       </font>
+      </property>
+      <property name="value">
+       <number>24</number>
       </property>
      </widget>
     </item>
