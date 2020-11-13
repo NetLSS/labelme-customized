@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>Dialog</class>
  <widget class="QDialog" name="Dialog">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -9,6 +12,15 @@
     <width>1080</width>
     <height>640</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
    <string>ATI Label Validator</string>
@@ -59,6 +71,9 @@
    </widget>
   </widget>
   <widget class="QScrollArea" name="scrollArea_2">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>450</x>
@@ -125,6 +140,9 @@
       <property name="text">
        <string>Open</string>
       </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
      </widget>
     </item>
     <item row="2" column="0" colspan="3">
@@ -138,6 +156,9 @@
      <widget class="QPushButton" name="pushButton_openB">
       <property name="text">
        <string>Open</string>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
       </property>
      </widget>
     </item>
@@ -161,7 +182,7 @@
        <string/>
       </property>
       <property name="placeholderText">
-       <string>set the first folder containing label .json files</string>
+       <string>set the first folder containing label .json files (this folder will be merge base)</string>
       </property>
      </widget>
     </item>
@@ -176,10 +197,16 @@
       <property name="text">
        <string>Process</string>
       </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
      </widget>
     </item>
     <item row="2" column="3">
      <widget class="QLineEdit" name="lineEdit_iouThreshold">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="sizePolicy">
        <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
         <horstretch>0</horstretch>
@@ -264,8 +291,8 @@
    <property name="geometry">
     <rect>
      <x>980</x>
-     <y>520</y>
-     <width>93</width>
+     <y>490</y>
+     <width>92</width>
      <height>28</height>
     </rect>
    </property>
@@ -277,8 +304,8 @@
    <property name="geometry">
     <rect>
      <x>880</x>
-     <y>520</y>
-     <width>93</width>
+     <y>490</y>
+     <width>92</width>
      <height>28</height>
     </rect>
    </property>
@@ -290,7 +317,7 @@
    <property name="geometry">
     <rect>
      <x>880</x>
-     <y>490</y>
+     <y>440</y>
      <width>90</width>
      <height>15</height>
     </rect>
@@ -338,10 +365,16 @@
    <property name="geometry">
     <rect>
      <x>880</x>
-     <y>470</y>
+     <y>420</y>
      <width>64</width>
      <height>15</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
    </property>
    <property name="text">
     <string>Filtered</string>
@@ -351,20 +384,26 @@
    <property name="geometry">
     <rect>
      <x>880</x>
-     <y>430</y>
-     <width>71</width>
+     <y>380</y>
+     <width>150</width>
      <height>16</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
    <property name="text">
-    <string>Total label</string>
+    <string>Total matched label</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_total_index">
    <property name="geometry">
     <rect>
      <x>880</x>
-     <y>450</y>
+     <y>400</y>
      <width>64</width>
      <height>15</height>
     </rect>
@@ -377,10 +416,16 @@
    <property name="geometry">
     <rect>
      <x>880</x>
-     <y>320</y>
+     <y>270</y>
      <width>150</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
    </property>
    <property name="text">
     <string>Lowest score class</string>
@@ -390,7 +435,7 @@
    <property name="geometry">
     <rect>
      <x>880</x>
-     <y>340</y>
+     <y>290</y>
      <width>50</width>
      <height>20</height>
     </rect>
@@ -399,11 +444,11 @@
     <string>name: </string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_8">
+  <widget class="QLabel" name="label_accuraacy">
    <property name="geometry">
     <rect>
      <x>880</x>
-     <y>360</y>
+     <y>310</y>
      <width>70</width>
      <height>16</height>
     </rect>
@@ -412,11 +457,11 @@
     <string>accuracy:</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_9">
+  <widget class="QLabel" name="label_iou">
    <property name="geometry">
     <rect>
      <x>879</x>
-     <y>380</y>
+     <y>330</y>
      <width>61</width>
      <height>20</height>
     </rect>
@@ -429,10 +474,16 @@
    <property name="geometry">
     <rect>
      <x>950</x>
-     <y>340</y>
+     <y>290</y>
      <width>130</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
    </property>
    <property name="text">
     <string/>
@@ -442,7 +493,7 @@
    <property name="geometry">
     <rect>
      <x>950</x>
-     <y>360</y>
+     <y>310</y>
      <width>130</width>
      <height>20</height>
     </rect>
@@ -455,7 +506,7 @@
    <property name="geometry">
     <rect>
      <x>950</x>
-     <y>380</y>
+     <y>330</y>
      <width>130</width>
      <height>20</height>
     </rect>
@@ -498,6 +549,9 @@
    <property name="autoRepeat">
     <bool>false</bool>
    </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="pushButton_deleteB">
    <property name="geometry">
@@ -510,6 +564,9 @@
    </property>
    <property name="text">
     <string>delete file</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_copyPathA">
@@ -524,6 +581,9 @@
    <property name="text">
     <string>copy path</string>
    </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="pushButton_copyPathB">
    <property name="geometry">
@@ -536,6 +596,9 @@
    </property>
    <property name="text">
     <string>copy path</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_copyFolderA">
@@ -550,6 +613,9 @@
    <property name="text">
     <string>copy folder</string>
    </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="pushButton_copyFolderB">
    <property name="geometry">
@@ -563,8 +629,49 @@
    <property name="text">
     <string>copy folder</string>
    </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_merge_quit">
+   <property name="geometry">
+    <rect>
+     <x>962</x>
+     <y>600</y>
+     <width>111</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Merge &amp;&amp; Quit</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit_folderA</tabstop>
+  <tabstop>lineEdit_folderB</tabstop>
+  <tabstop>pushButton_openA</tabstop>
+  <tabstop>pushButton_openB</tabstop>
+  <tabstop>pushButton_process</tabstop>
+  <tabstop>comboBox_mode</tabstop>
+  <tabstop>lineEdit_threshold</tabstop>
+  <tabstop>pushButton_filter_apply</tabstop>
+  <tabstop>pushButton_deleteA</tabstop>
+  <tabstop>pushButton_copyPathA</tabstop>
+  <tabstop>pushButton_copyFolderA</tabstop>
+  <tabstop>pushButton_deleteB</tabstop>
+  <tabstop>pushButton_copyPathB</tabstop>
+  <tabstop>pushButton_copyFolderB</tabstop>
+  <tabstop>pushButton_left</tabstop>
+  <tabstop>pushButton_right</tabstop>
+  <tabstop>pushButton_merge_quit</tabstop>
+  <tabstop>lineEdit_iouThreshold</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>scrollArea</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

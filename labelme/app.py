@@ -640,9 +640,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("&label validator"),
             self.label_validator,
             None,
-            "label_validator",
+            "copy",
             self.tr(u"label_validator"),
-            enabled=True
+            enabled=True,
         )
 
         # Lavel list context menu.

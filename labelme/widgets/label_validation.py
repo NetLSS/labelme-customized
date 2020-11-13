@@ -9,7 +9,7 @@ from PyQt5 import uic
 from PyQt5.QtGui import QPalette, QImage, qRgb, QPixmap
 #from labelme.cli.validation_json import *
 import subprocess
-
+import shutil
 import clipboard
 import win32clipboard
 import argparse
@@ -20,6 +20,7 @@ import csv
 from labelme.label_file import LabelFile
 from labelme.logger import logger
 from labelme import utils
+from labelme.widgets.photoViewer import PhotoViewer
 
 import imgviz
 import matplotlib.pyplot as plt
@@ -76,6 +77,8 @@ class ResultData:
         self.vis_Qimg_target = None
 
 
+
+
 class LabelValidationDialog(QDialog, from_class):
     # filteredResultDataList: list[ResultData]
 
@@ -84,6 +87,8 @@ class LabelValidationDialog(QDialog, from_class):
         super().__init__()
         # region pyQT UI
         self.setupUi(self)
+
+        self.setFixedSize(self.width(), self.height())
 
         self.gray_color_table = [qRgb(i, i, i) for i in range(256)]
 
@@ -98,6 +103,10 @@ class LabelValidationDialog(QDialog, from_class):
         self.pushButton_copyPathB.clicked.connect(self.onButtonClickCopyPathB)
         self.pushButton_copyFolderB.clicked.connect(self.onButtonClickCopyFolderB)
         self.pushButton_deleteA.clicked.connect(self.onButtonClickDeleteA)
+        self.pushButton_deleteB.clicked.connect(self.onButtonClickDeleteB)
+        self.pushButton_merge_quit.clicked.connect(self.onButtonClickMergeQuit)
+
+        qqq = QLabel()
 
         self.progressBar.setValue(0)
 
@@ -106,6 +115,13 @@ class LabelValidationDialog(QDialog, from_class):
 
         self.lineEdit_iouThreshold.editingFinished.connect(self.onEditionFinishedIouThreshold)
 
+        self.viewerA = PhotoViewer(self)
+        self.viewerA.setFixedSize(416, 416)
+        self.viewerA.setGeometry(20, 130, 416, 416)
+
+        self.viewerB = PhotoViewer(self)
+        self.viewerB.setFixedSize(416, 416)
+        self.viewerB.setGeometry(450, 130, 416, 416)
 
         # endregion
 
@@ -113,34 +129,132 @@ class LabelValidationDialog(QDialog, from_class):
         self.filteredResultDataList = []
         self.current_image_index = -1
 
+        self.only_target_folder_json = []
+        self.only_true_folder_json = []
+
+    def onButtonClickMergeQuit(self):
+
+        if not self.checkResultDataListIsExist():
+            self.close()
+            return
+
+        true_json_folder_path = self.lineEdit_folderA.text()
+        target_json_folder_path = self.lineEdit_folderB.text()
+
+        reply = QMessageBox.question(self, "warning", 'Are you sure to merge?', QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            merged_folder = osp.join(true_json_folder_path, f"__merged({len(self.only_target_folder_json)})")
+            not_covered_folder = osp.join(true_json_folder_path, f"__not_covered({len(self.only_true_folder_json)})")
+            if not osp.exists(merged_folder):
+                os.mkdir(merged_folder)
+            if not osp.exists(not_covered_folder):
+                os.mkdir(not_covered_folder)
+
+            merged_list_f = open(osp.join(merged_folder, "merged_file_list.txt"), 'wt', encoding="utf-8")
+            not_covrd_list_f = open(osp.join(not_covered_folder, "not_covered_file_list.txt"), 'wt', encoding="utf-8")
+
+            for filepath in self.only_target_folder_json:
+                shutil.copy(filepath, osp.join(true_json_folder_path, osp.basename(filepath)))
+                merged_list_f.write(f"{osp.basename(filepath)}\n")
+
+            for filepath in self.only_true_folder_json:
+                not_covrd_list_f.write(f"{osp.basename(filepath)}\n")
+
+            merged_list_f.close()
+            not_covrd_list_f.close()
+
+            QMessageBox.information(self, "info", "merge finished.")
+
+            self.close()
+            return
+        else:
+            return
+
+
+
+    def checkResultDataListIsExist(self):
+        if self.filteredResultDataList:
+            if len(self.filteredResultDataList) <= 0:
+                return False
+        else:
+            return False
+        return True
+
+    def onButtonClickDeleteB(self):
+        arr_index = self.current_image_index - 1
+
+        if not self.checkResultDataListIsExist():
+            return
+
+        reply = QMessageBox.question(self, "warning", 'Are you sure to delete?', QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.move2DeleteFolderAndReplacement(arr_index, buttonA=False)
+        else:
+            return
+
+    def move2DeleteFolderAndReplacement(self, arr_index, buttonA=True):
+        if osp.exists(self.filteredResultDataList[arr_index].json_true):
+
+            # os.remove(self.filteredResultDataList[arr_index].json_true)
+
+            if buttonA:
+                jsonA = self.filteredResultDataList[arr_index].json_true
+                jsonB = self.filteredResultDataList[arr_index].json_target
+            else:  # buttonB
+                jsonB = self.filteredResultDataList[arr_index].json_true
+                jsonA = self.filteredResultDataList[arr_index].json_target
+
+            remove_folder_path = osp.join(osp.dirname(jsonA), "__removed")
+
+            if not osp.exists(remove_folder_path):
+                os.mkdir(remove_folder_path)
+            shutil.move(jsonA, osp.join(remove_folder_path, osp.basename(jsonA)))
+            if osp.exists(jsonB):
+                # 삭제(__removed로 이동) 후 jsonB를 가져와서 대체
+                shutil.copy(jsonB, osp.join(osp.dirname(jsonA), osp.basename(jsonB)))
+            else:
+                QMessageBox.warning(self, "warning", "no merge target file.")
+
+            self.filteredResultDataList.remove(self.filteredResultDataList[arr_index])
+            # self.current_image_index += 1
+            self.updateImageLabel()
+
+    @classmethod
+    def setClipboardText(cls, string):
+        win32clipboard.OpenClipboard()
+        win32clipboard.EmptyClipboard()
+        win32clipboard.SetClipboardText(string)
+        win32clipboard.CloseClipboard()
 
     def onButtonClickCopyFolderB(self):
         arr_index = self.current_image_index - 1
         # clipboard.copy(self.filteredResultDataList[arr_index].json_true)
 
-        win32clipboard.OpenClipboard()
-        win32clipboard.EmptyClipboard()
-        win32clipboard.SetClipboardText(osp.dirname(self.filteredResultDataList[arr_index].json_target))
-        win32clipboard.CloseClipboard()
+        if not self.checkResultDataListIsExist():
+            return
+
+        self.setClipboardText(osp.dirname(self.filteredResultDataList[arr_index].json_target))
 
     def onButtonClickCopyPathB(self):
         arr_index = self.current_image_index - 1
         # clipboard.copy(self.filteredResultDataList[arr_index].json_true)
 
-        win32clipboard.OpenClipboard()
-        win32clipboard.EmptyClipboard()
-        win32clipboard.SetClipboardText(self.filteredResultDataList[arr_index].json_target)
-        win32clipboard.CloseClipboard()
+        if not self.checkResultDataListIsExist():
+            return
+        self.setClipboardText(self.filteredResultDataList[arr_index].json_target)
+
 
     def onButtonClickDeleteA(self):
         arr_index = self.current_image_index - 1
+
+        if not self.checkResultDataListIsExist():
+            return
+
         reply = QMessageBox.question(self, "warning", 'Are you sure to delete?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            if osp.exists(self.filteredResultDataList[arr_index].json_true):
-                os.remove(self.filteredResultDataList[arr_index].json_true)
-                self.filteredResultDataList.remove(self.filteredResultDataList[arr_index])
-                self.current_image_index += 1
-                self.updateImageLabel()
+            self.move2DeleteFolderAndReplacement(arr_index, buttonA=True)
         else:
             return
 
@@ -150,24 +264,24 @@ class LabelValidationDialog(QDialog, from_class):
         arr_index = self.current_image_index - 1
         # clipboard.copy(self.filteredResultDataList[arr_index].json_true)
 
-        win32clipboard.OpenClipboard()
-        win32clipboard.EmptyClipboard()
-        win32clipboard.SetClipboardText(osp.dirname(self.filteredResultDataList[arr_index].json_true))
-        win32clipboard.CloseClipboard()
+        if not self.checkResultDataListIsExist():
+            return
+
+        self.setClipboardText(osp.dirname(self.filteredResultDataList[arr_index].json_true))
+
 
     def onButtonClickCopyPathA(self):
         arr_index = self.current_image_index - 1
         #clipboard.copy(self.filteredResultDataList[arr_index].json_true)
 
-        win32clipboard.OpenClipboard()
-        win32clipboard.EmptyClipboard()
-        win32clipboard.SetClipboardText(self.filteredResultDataList[arr_index].json_true)
-        win32clipboard.CloseClipboard()
+        if not self.checkResultDataListIsExist():
+            return
+
+        self.setClipboardText(self.filteredResultDataList[arr_index].json_true)
 
     def onButtonClickFilterApply(self):
         self.updateFilteredResultList()
         QMessageBox.information(self, "information", "Applied.")
-
 
     def onButtonClickRight(self):
 
@@ -208,7 +322,7 @@ class LabelValidationDialog(QDialog, from_class):
         if path:
             self.lineEdit_folderB.setText(path)
 
-    def onButtonClickProcess(self):
+    def onButtonClickProcess(self, isDebug=False):
         true_json_folder_path = self.lineEdit_folderA.text()
         target_json_folder_path = self.lineEdit_folderB.text()
         iou_treshold_value = float(self.lineEdit_iouThreshold.text())
@@ -220,7 +334,8 @@ class LabelValidationDialog(QDialog, from_class):
             os.mkdir(result_path)
 
         true_json_list = glob.glob(os.path.join(true_json_folder_path, "*.json"))
-        # target_json_list = glob.glob(os.path.join(target_json_folder_path, "*.json"))
+        target_json_list = glob.glob(os.path.join(target_json_folder_path, "*.json"))
+        self.only_target_folder_json = target_json_list
 
         self.progressBar.setValue(0)
         self.progressBar.setMaximum(len(true_json_list))
@@ -233,7 +348,10 @@ class LabelValidationDialog(QDialog, from_class):
                 result_list.append(
                     [len(result_list), osp.basename(true_json), "None", "None", "None", "None", "None", "None", "None"])
                 not_matched_files.append(target_json)
+                self.only_true_folder_json.append(target_json)
             else:
+                self.only_target_folder_json.remove(target_json)
+
                 self.validate_json_file(true_json, target_json, result_path, iou_treshold_value)
 
                 data_true = json.load(open(true_json))
@@ -254,7 +372,9 @@ class LabelValidationDialog(QDialog, from_class):
                 # self.label_imageA.adjustSize()
 
             self.progressBar.setValue(i+1)
-
+        if isDebug:
+            print(f"debug target only json {self.only_target_folder_json}")
+            print(f"debug true only json {self.only_true_folder_json}")
         self.save_result_csv(osp.join(result_path, "result_total.csv"))
         self.updateFilteredResultList()
 
@@ -418,19 +538,25 @@ class LabelValidationDialog(QDialog, from_class):
             Qimage_target = self.tpQImage(vis_img_target)
 
         # TODO: speed issue
-        self.label_imageA.setPixmap(QPixmap.fromImage(Qimage_true))
-        self.label_imageB.setPixmap(QPixmap.fromImage(Qimage_target))
+        # self.label_imageA.setPixmap(QPixmap.fromImage(Qimage_true))
+        # self.label_imageB.setPixmap(QPixmap.fromImage(Qimage_target))
+        self.viewerA.setPhoto(QPixmap.fromImage(Qimage_true))
+        self.viewerB.setPhoto(QPixmap.fromImage(Qimage_target))
 
         filter_mode = self.comboBox_mode.currentText()
         if filter_mode == "iou":
             self.label_class_name.setText(str(self.filteredResultDataList[arr_index].class_names[self.filteredResultDataList[arr_index].lowest_iou_i]))
             self.label_class_accuracy.setText(str(self.filteredResultDataList[arr_index].accuracy_list[self.filteredResultDataList[arr_index].lowest_iou_i]))
             self.label_class_iou.setText(str(self.filteredResultDataList[arr_index].lowest_iou))
+            self.label_iou.setStyleSheet("color: red;")
+            self.label_accuraacy.setStyleSheet("color: black;")
         elif filter_mode == "accuracy":
             self.label_class_name.setText(
                 str(self.filteredResultDataList[arr_index].class_names[self.filteredResultDataList[arr_index].lowest_acc_i]))
             self.label_class_accuracy.setText(str(self.filteredResultDataList[arr_index].lowest_acc))
             self.label_class_iou.setText(str(self.filteredResultDataList[arr_index].iou_list[self.filteredResultDataList[arr_index].lowest_acc_i]))
+            self.label_iou.setStyleSheet("color: black;")
+            self.label_accuraacy.setStyleSheet("color: black;")
 
 
         self.label_imageA_name.setText(osp.basename(self.filteredResultDataList[arr_index].json_true))
@@ -501,8 +627,11 @@ class LabelValidationDialog(QDialog, from_class):
             Qimage_true = self.tpQImage(img_true)  # QImage(img_true.data, h, w, QImage.Format_Indexed8)
             Qimage_target = self.tpQImage(img_target)
 
-            self.label_imageA.setPixmap(QPixmap.fromImage(Qimage_true))
-            self.label_imageB.setPixmap(QPixmap.fromImage(Qimage_target))
+            # self.label_imageA.setPixmap(QPixmap.fromImage(Qimage_true))
+            # self.label_imageB.setPixmap(QPixmap.fromImage(Qimage_target))
+
+            self.viewerA.setPhoto(QPixmap.fromImage(Qimage_true))
+            self.viewerB.setPhoto(QPixmap.fromImage(Qimage_target))
 
         # print(f"lbl_true {lbl_true}")
         # print(f"lbl_target {lbl_target}")
