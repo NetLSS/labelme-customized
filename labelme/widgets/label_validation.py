@@ -340,7 +340,6 @@ class LabelValidationDialog(QDialog, from_class):
         elif float(txt) < 0.0:
             self.lineEdit_threshold.setText("0.0")
 
-
     def onButtonClickOpenA(self):
         path = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
         if path:
