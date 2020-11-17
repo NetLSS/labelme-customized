@@ -7,6 +7,7 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
 from PyQt5.QtGui import QPalette, QImage, qRgb, QPixmap
+from PyQt5.QtCore import Qt
 #from labelme.cli.validation_json import *
 import subprocess
 import shutil
@@ -137,6 +138,15 @@ class LabelValidationDialog(QDialog, from_class):
 
         self.only_target_folder_json = []
         self.only_true_folder_json = []
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Escape:
+            self.close()
+        elif e.key() == Qt.Key_D or e.key() == Qt.Key_Right:
+            self.onButtonClickRight()
+        elif e.key() == Qt.Key_A or e.key() == Qt.Key_Left:
+            self.onButtonClickLeft()
+
 
     def onButtonClickMergeQuit(self):
 
