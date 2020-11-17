@@ -147,7 +147,6 @@ class LabelValidationDialog(QDialog, from_class):
         elif e.key() == Qt.Key_A or e.key() == Qt.Key_Left:
             self.onButtonClickLeft()
 
-
     def onButtonClickMergeQuit(self):
 
         if not self.checkResultDataListIsExist():
@@ -394,23 +393,6 @@ class LabelValidationDialog(QDialog, from_class):
 
                 self.validate_json_file(true_json, target_json, result_path, iou_treshold_value)
 
-                # data_true = json.load(open(true_json))
-                # data_target = json.load(open(target_json))
-
-                # img_true = self.image_data_load(data_true)
-                # img_target = self.image_data_load(data_target)
-                #
-                # img_true = np.array(img_true)
-                # img_target = np.array(img_target)
-
-                # Qimage_true = self.tpQImage(img_true)#QImage(img_true.data, h, w, QImage.Format_Indexed8)
-                # Qimage_target = self.tpQImage(img_target)
-                #
-                # self.label_imageA.setPixmap(QPixmap.fromImage(Qimage_true))
-                # self.label_imageB.setPixmap(QPixmap.fromImage(Qimage_target))
-
-                # self.label_imageA.adjustSize()
-
             self.progressBar.setValue(i+1)
         if isDebug:
             print(f"debug target only json {self.only_target_folder_json}")
@@ -596,14 +578,12 @@ class LabelValidationDialog(QDialog, from_class):
             self.label_class_accuracy.setText(str(self.filteredResultDataList[arr_index].lowest_acc))
             self.label_class_iou.setText(str(self.filteredResultDataList[arr_index].iou_list[self.filteredResultDataList[arr_index].lowest_acc_i]))
             self.label_iou.setStyleSheet("color: black;")
-            self.label_accuraacy.setStyleSheet("color: black;")
-
+            self.label_accuraacy.setStyleSheet("color: red;")
 
         self.label_imageA_name.setText(osp.basename(self.filteredResultDataList[arr_index].json_true))
         self.label_imageB_name.setText(osp.basename(self.filteredResultDataList[arr_index].json_target))
 
         self.label_image_index.setText(f"{self.current_image_index}/{len(self.filteredResultDataList)}")
-
 
     def updateFilteredResultList(self):
         filter_mode = self.comboBox_mode.currentText()
@@ -631,8 +611,6 @@ class LabelValidationDialog(QDialog, from_class):
         self.updateImageLabel()
 
         # self.filteredResultDataList
-
-        pass
 
     def validate_json_file(self, true_json, target_json, out_full_path=None, threshold=0.5, show_image=False, isDebug=False, save_image=False):
         json_file_true = true_json
@@ -759,7 +737,6 @@ class LabelValidationDialog(QDialog, from_class):
                           lbl_true - lbl_target)
             logger.info("Saved to: {}".format(current_out_dir))
         # endregion
-
 
     def get_json_file_list(self, true_json_folder_path):
         return glob.glob(os.path.join(true_json_folder_path, "*.json"))
