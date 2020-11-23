@@ -7,6 +7,8 @@ import sys
 import yaml
 
 """
+파이썬 버전 3.6버전 사용할 것.
+
 사용시 아래 경로에 root 폴더 지정할것.
 C:\\Users\\[사용자명]\\.labelmerc 제거하고 실행하기.
 """

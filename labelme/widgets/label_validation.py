@@ -27,7 +27,7 @@ import imgviz
 import matplotlib.pyplot as plt
 
 
-TEST_MODE = True
+TEST_MODE = False
 
 if TEST_MODE:
     os.chdir(r'D:\2020\DS\Project\2020-11-02-labelme\labelme-master\labelme')
