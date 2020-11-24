@@ -34,5 +34,5 @@ def default_init():
     if not os.path.exists(default_flag_file_path):
         with open(default_flag_file_path, 'w', encoding="utf-8") as f:
             f.write("__ignore__\n")
-            f.write("cat\n")
-            f.write("dog\n")
+            f.write("class1\n")
+            f.write("class2\n")
