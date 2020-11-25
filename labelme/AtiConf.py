@@ -6,6 +6,7 @@ from qtpy.QtCore import Qt
 from qtpy import QtGui
 from qtpy import QtWidgets
 
+# set default label, flag txt file path
 default_label_file_path = r"C:\labelme\labels.txt"
 default_flag_file_path = r"C:\labelme\flags.txt"
 
@@ -14,12 +15,13 @@ default_flag_color = Qt.cyan
 is_show_flag_default_message = True
 is_show_label_default_message = True
 
-def make_dir_tree(dir):
-    pathlib.Path(dir).mkdir(parents=True, exist_ok=True)
+
+def make_dir_tree(dir_path):
+    pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
 
 
 def default_init():
-    # create default path
+    # create default dir path
     if not os.path.exists(os.path.dirname(default_label_file_path)):
         make_dir_tree(os.path.dirname(default_label_file_path))
 
