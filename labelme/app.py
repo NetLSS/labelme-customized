@@ -452,6 +452,12 @@ class MainWindow(QtWidgets.QMainWindow):
             tip=self.tr("Show tutorial page"),
         )
 
+        version_menu = action(
+            self.tr(f"&labelme {ati.version}v"),
+            self.version_menu,
+            icon="help",
+        )
+
         zoom = QtWidgets.QWidgetAction(self)
         zoom.setDefaultWidget(self.zoomWidget)
         self.zoomWidget.setWhatsThis(
@@ -789,7 +795,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 quit,
             ),
         )
-        utils.addActions(self.menus.help, (help,))
+        utils.addActions(self.menus.help, (help, version_menu))
         utils.addActions(
             self.menus.tools,
             (
@@ -1058,6 +1064,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def tutorial(self):
         url = "https://github.com/wkentaro/labelme/tree/master/examples/tutorial"  # NOQA
         webbrowser.open(url)
+
+    def version_menu(self):
+        pass
 
     def toggleDrawingSensitive(self, drawing=True):
         """Toggle drawing sensitive.

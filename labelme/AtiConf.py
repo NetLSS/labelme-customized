@@ -6,6 +6,9 @@ from qtpy.QtCore import Qt
 from qtpy import QtGui
 from qtpy import QtWidgets
 
+# version
+version = "(2020-11-25)"  # TODO: version update
+
 # set default label, flag txt file path
 default_label_file_path = r"C:\labelme\labels.txt"
 default_flag_file_path = r"C:\labelme\flags.txt"
