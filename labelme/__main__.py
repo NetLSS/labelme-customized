@@ -9,7 +9,7 @@ import yaml
 """
 파이썬 버전 3.6.8버전 사용할 것.
 
-사용시 아래 경로에 root 폴더 지정할것.
+사용시 아래 경로에 root 폴더 지정할것. (->  ../ 로 대체)
 C:\\Users\\[사용자명]\\.labelmerc 제거하고 실행하기.
 """
 
@@ -145,7 +145,7 @@ def main():
                 args.labels = [line.strip() for line in f if line.strip()]
         else:
             args.labels = [line for line in args.labels.split(",") if line]
-    else:  # if 인자로 설정 안한 경우 set default file
+    else:  # cmd 명령행 인자로 설정 안한 경우 set default file
         if os.path.isfile(ati.default_label_file_path):
             with codecs.open(ati.default_label_file_path, "r", encoding="utf-8") as f:
                 args.labels = [line.strip() for line in f if line.strip()]
