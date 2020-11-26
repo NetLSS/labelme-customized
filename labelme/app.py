@@ -221,6 +221,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "quit",
             self.tr("Quit application"),
         )
+
         open_ = action(
             self.tr("&Open"),
             self.openFile,
@@ -228,6 +229,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "open",
             self.tr("Open image or label file"),
         )
+
         opendir = action(
             self.tr("&Open Dir"),
             self.openDirDialog,
@@ -243,6 +245,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr(u"Open next (hold Ctl+Shift to copy labels)"),
             enabled=False,
         )
+
         openPrevImg = action(
             self.tr("&Prev Image"),
             self.openPrevImg,
@@ -251,6 +254,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr(u"Open prev (hold Ctl+Shift to copy labels)"),
             enabled=False,
         )
+
         save = action(
             self.tr("&Save"),
             self.saveFile,
@@ -259,6 +263,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Save labels to file"),
             enabled=False,
         )
+
         saveAs = action(
             self.tr("&Save As"),
             self.saveFileAs,
@@ -331,6 +336,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Start drawing polygons"),
             enabled=False,
         )
+
         createRectangleMode = action(
             self.tr("사각형 모드"), #self.tr("Create Rectangle"),
             lambda: self.toggleDrawMode(False, createMode="rectangle"),
@@ -339,6 +345,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Start drawing rectangles"),
             enabled=False,
         )
+
         createCircleMode = action(
             self.tr("원형 모드"),#self.tr("Create Circle"),
             lambda: self.toggleDrawMode(False, createMode="circle"),
@@ -347,6 +354,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Start drawing circles"),
             enabled=False,
         )
+
         createLineMode = action(
             self.tr("직선형 모드"),#self.tr("Create Line"),
             lambda: self.toggleDrawMode(False, createMode="line"),
@@ -355,6 +363,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Start drawing lines"),
             enabled=False,
         )
+
         createPointMode = action(
             self.tr("점 모드"),#self.tr("Create Point"),
             lambda: self.toggleDrawMode(False, createMode="point"),
@@ -363,6 +372,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Start drawing points"),
             enabled=False,
         )
+
         createLineStripMode = action(
             self.tr("다직선 모드"), #self.tr("Create LineStrip"),
             lambda: self.toggleDrawMode(False, createMode="linestrip"),
@@ -371,6 +381,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Start drawing linestrip. Ctrl+LeftClick ends creation."),
             enabled=False,
         )
+
         editMode = action(
             self.tr("수정 모드"),  # self.tr("Edit Polygons"),
             self.setEditMode,
@@ -397,6 +408,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Create a duplicate of the selected polygons"),
             enabled=False,
         )
+
         undoLastPoint = action(
             self.tr("Undo last point"),
             self.canvas.undoLastPoint,
@@ -405,6 +417,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Undo last drawn point"),
             enabled=False,
         )
+
         addPointToEdge = action(
             text=self.tr("Add Point to Edge"),
             slot=self.canvas.addPointToEdge,
@@ -413,6 +426,7 @@ class MainWindow(QtWidgets.QMainWindow):
             tip=self.tr("Add point to the nearest edge"),
             enabled=False,
         )
+
         removePoint = action(
             text="Remove Selected Point",
             slot=self.canvas.removeSelectedPoint,
@@ -437,6 +451,7 @@ class MainWindow(QtWidgets.QMainWindow):
             tip=self.tr("Hide all polygons"),
             enabled=False,
         )
+
         showAll = action(
             self.tr("&Show\nPolygons"),
             functools.partial(self.togglePolygons, True),
